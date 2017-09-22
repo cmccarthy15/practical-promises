@@ -159,11 +159,18 @@ function problemD () {
   var randIdx = Math.floor(Math.random() * filenames.length);
   filenames[randIdx] = 'wrong-file-name-' + (randIdx + 1) + '.txt';
 
-  // VERSION TWO
-  // var filePromises = [];
-  // filenames.forEach(function(file){
-  //   filePromises.push(promisifiedReadFile(file) );
-  // });
+  // VERSION ONE
+  var filePromises = [];
+  filenames.forEach(function(file){
+    filePromises.push(promisifiedReadFile(file) );
+  });
+
+  Promise.each(filenames, function(filename){
+    return promisifiedReadFile(filename)
+    .then(function(value) {blue(value);})
+  })
+  .then(null, function(err) {magenta(err);})
+  .then(function(){console.log('done');});
 
   // callback version
   // async.eachSeries(filenames,
@@ -181,10 +188,13 @@ function problemD () {
   //   }
   // );
 
-  // promise version
-  // ???
-  //  VERSION ONE
-  // Promise.each(filePromises, function(value){blue(value);})
+  // var filePromises = [];
+  // filenames.forEach(function(file){
+  //   filePromises.push(promisifiedReadFile(file).then(function(value){blue(value);}))
+  //   ;
+  // });
+
+  // Promise.each(filePromises, function(){})
   // .then(null, function(err) {magenta(err);})
   // .then(function(){console.log('done');});
 
@@ -197,8 +207,48 @@ function problemE () {
    *
    */
 
+   // your code here
+
   var fs = require('fs');
   function promisifiedWriteFile (filename, str) {
-    // your code here
+    return new Promise(function(resolve, reject){
+      fs.writeFile(filename, str, function(err, str){
+        if (err) reject(err);
+        else resolve(filename);
+      });
+    });
   }
+
+
+  promisifiedWriteFile('poem-three.txt', 'Lina and Caryn say hi')
+  .then(function(name){ console.log(name, ' has finished writing');},
+        function(err) { console.log(magenta(err));}
+  );
 }
+
+
+
+
+
+
+/*
+ *
+ * utils.readFile = function (filename, callback) {
+	var randExtraTime = Math.random() * 200;
+	setTimeout(function () {
+		fs.readFile(filename, function (err, buffer) {
+			if (err) callback(err);
+			else callback(null, buffer.toString());
+		});
+	}, randExtraTime);
+};
+
+utils.promisifiedReadFile = function (filename) {
+	return new Promise(function (resolve, reject) {
+		utils.readFile(filename, function (err, str) {
+			if (err) reject(err);
+			else resolve(str);
+		});
+	});
+};
+ */
